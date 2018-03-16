@@ -24,12 +24,22 @@ import Data.Char
 import System.IO
 
 main = do
-  [fname] <- getArgs
-  acts <- loadData fname
-  print acts
+  [fname, itemName] <- getArgs
+  items <- loadData fname
+  print $ getBatchPriceByGood itemName items
 
 data Item = Item String Int Double
   deriving (Show)
+
+
+itemName :: Item->String
+itemName (Item name _ _) = name
+--
+itemCount :: Item->Int
+itemCount (Item _ count _) = count
+--
+itemPrice :: Item->Double
+itemPrice (Item  _ _ price) = price
 
 str2item :: String -> Item
 str2item = buildItem.words
@@ -40,5 +50,8 @@ str2item = buildItem.words
 
 loadData :: FilePath -> IO [Item]
 loadData fname = do
-fc <- readFile fname
-return $ map str2item $ lines fc
+  fc <- readFile fname
+  return $ map str2item $ lines fc
+
+getBatchPriceByGood :: String->[Item]->Double
+getBatchPriceByGood name items = foldl (\acc x -> ((itemPrice x) * (fromIntegral (itemCount x)) + acc)) 0.0 (filter (\x-> (itemName x == name)) items)
