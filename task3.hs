@@ -24,9 +24,11 @@ import Data.Char
 import System.IO
 
 main = do
-  [fname, itemName] <- getArgs
+  [fname, itemName, limit] <- getArgs
   items <- loadData fname
+  -- print $ items
   print $ getBatchPriceByGood itemName items
+  print $  getBatchesStatsCountLessThan (read limit) items
 
 data Item = Item String Int Double
   deriving (Show)
@@ -55,3 +57,6 @@ loadData fname = do
 
 getBatchPriceByGood :: String->[Item]->Double
 getBatchPriceByGood name items = foldl (\acc x -> ((itemPrice x) * (fromIntegral (itemCount x)) + acc)) 0.0 (filter (\x-> (itemName x == name)) items)
+
+getBatchesStatsCountLessThan :: Int->[Item]->[Item]
+getBatchesStatsCountLessThan n items = filter (\x->(itemCount x < n)) items
